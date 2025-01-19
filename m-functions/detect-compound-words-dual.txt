@@ -1,0 +1,28 @@
+let
+    StandardizeCompoundWords = (inputText as text, CompoundTokensTable as table) as text =>
+        let
+            // Convert the table to a list of records containing both Token and Token2
+            CompoundList = Table.ToRecords(CompoundTokensTable),
+            
+            // Loop through each record and replace both Token and Token2 in the input text
+            Result = List.Accumulate(
+                CompoundList,
+                inputText,
+                (currentText, record) =>
+                    let
+                        token = record[Token],
+                        token2 = record[Token2],
+                        
+                        // Create the underscore version of Token
+                        underscoredToken = Text.Replace(token, " ", "_"),
+                        
+                        // Replace occurrences of both Token and Token2 with the underscored Token
+                        replacedText1 = Text.Replace(currentText, token, underscoredToken & " "),
+                        replacedText2 = Text.Replace(replacedText1, token2, underscoredToken & " ")
+                    in
+                        replacedText2
+            )
+        in
+            Result
+in
+    StandardizeCompoundWords
